@@ -11,7 +11,7 @@ import buildFFT from "./engine_fft.js";
 
 export default async function buildEngine(params) {
 
-    const tm = await buildThreadManager(params.wasm, params.singleThread);
+    const tm = await buildThreadManager(params.wasm, params.singleThread, params.overrideConcurrency);
 
 
     const curve = {};
@@ -66,5 +66,3 @@ export default async function buildEngine(params) {
 
     return curve;
 }
-
-

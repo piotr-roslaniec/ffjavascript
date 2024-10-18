@@ -5,7 +5,7 @@ import { ModuleBuilder } from "wasmbuilder";
 
 globalThis.curve_bn128 = null;
 
-export default async function buildBn128(singleThread, plugins) {
+export default async function buildBn128(singleThread, plugins, overrideConcurrency) {
     if ((!singleThread) && (globalThis.curve_bn128)) return globalThis.curve_bn128;
 
     const moduleBuilder = new ModuleBuilder();
@@ -41,7 +41,8 @@ export default async function buildBn128(singleThread, plugins) {
         n8q: 32,
         n8r: 32,
         cofactorG2: Scalar.e("30644e72e131a029b85045b68181585e06ceecda572a2489345f2299c0f9fa8d", 16),
-        singleThread: singleThread ? true : false
+        singleThread: singleThread ? true : false,
+        overrideConcurrency: overrideConcurrency,
     };
 
     const curve = await buildEngine(params);
@@ -58,4 +59,3 @@ export default async function buildBn128(singleThread, plugins) {
 
     return curve;
 }
-

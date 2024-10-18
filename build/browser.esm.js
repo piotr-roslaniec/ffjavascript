@@ -15692,7 +15692,7 @@ const threadStr = `(${"function thread(self) {\n    const MAXMEM = 32767;\n    l
 
 
 
-async function buildThreadManager(wasm, singleThread) {
+async function buildThreadManager(wasm, singleThread, overrideConcurrency) {
     const tm = new ThreadManager();
 
     tm.memory = new WebAssembly.Memory({initial:MEM_SIZE});
@@ -15747,6 +15747,10 @@ async function buildThreadManager(wasm, singleThread) {
 
         if(concurrency == 0){
             concurrency = 2;
+        }
+
+        if (overrideConcurrency) {
+            concurrency = overrideConcurrency;
         }
 
         // Limit to 64 threads for memory reasons.
@@ -16242,6 +16246,7 @@ function buildMultiexp(curve, groupName) {
         }
 
         const nPoints = Math.floor(buffBases.byteLength / sGIn);
+        if (nPoints == 0) return G.zero;
         const sScalar = Math.floor(buffScalars.byteLength / nPoints);
         if( sScalar * nPoints != buffScalars.byteLength) {
             throw new Error("Scalar size does not match");
@@ -17049,7 +17054,7 @@ function buildFFT(curve, groupName) {
 
 async function buildEngine(params) {
 
-    const tm = await buildThreadManager(params.wasm, params.singleThread);
+    const tm = await buildThreadManager(params.wasm, params.singleThread, params.overrideConcurrency);
 
 
     const curve = {};
@@ -18027,7 +18032,7 @@ class ModuleBuilder {
 
 globalThis.curve_bn128 = null;
 
-async function buildBn128(singleThread, plugins) {
+async function buildBn128(singleThread, plugins, overrideConcurrency) {
     if ((!singleThread) && (globalThis.curve_bn128)) return globalThis.curve_bn128;
 
     const moduleBuilder = new ModuleBuilder();
@@ -18063,7 +18068,8 @@ async function buildBn128(singleThread, plugins) {
         n8q: 32,
         n8r: 32,
         cofactorG2: e("30644e72e131a029b85045b68181585e06ceecda572a2489345f2299c0f9fa8d", 16),
-        singleThread: singleThread ? true : false
+        singleThread: singleThread ? true : false,
+        overrideConcurrency: overrideConcurrency,
     };
 
     const curve = await buildEngine(params);
@@ -18083,7 +18089,7 @@ async function buildBn128(singleThread, plugins) {
 
 globalThis.curve_bls12381 = null;
 
-async function buildBls12381(singleThread, plugins) {
+async function buildBls12381(singleThread, plugins, overrideConcurrency) {
     if ((!singleThread) && (globalThis.curve_bls12381)) return globalThis.curve_bls12381;
 
     const moduleBuilder = new ModuleBuilder();
@@ -18121,7 +18127,8 @@ async function buildBls12381(singleThread, plugins) {
         n8r: 32,
         cofactorG1: e("0x396c8c005555e1568c00aaab0000aaab", 16),
         cofactorG2: e("0x5d543a95414e7f1091d50792876a202cd91de4547085abaa68a205b2e5a7ddfa628f1cb4d9e82ef21537e293a6691ae1616ec6e786f0c70cf1c38e31c7238e5", 16),
-        singleThread: singleThread ? true : false
+        singleThread: singleThread ? true : false,
+        overrideConcurrency: overrideConcurrency,
     };
 
     const curve = await buildEngine(params);

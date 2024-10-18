@@ -55,7 +55,7 @@ if(process.browser) {
 
 
 
-export default async function buildThreadManager(wasm, singleThread) {
+export default async function buildThreadManager(wasm, singleThread, overrideConcurrency) {
     const tm = new ThreadManager();
 
     tm.memory = new WebAssembly.Memory({initial:MEM_SIZE});
@@ -112,6 +112,10 @@ export default async function buildThreadManager(wasm, singleThread) {
 
         if(concurrency == 0){
             concurrency = 2;
+        }
+
+        if (overrideConcurrency) {
+            concurrency = overrideConcurrency;
         }
 
         // Limit to 64 threads for memory reasons.

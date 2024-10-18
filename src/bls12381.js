@@ -5,7 +5,7 @@ import { ModuleBuilder } from "wasmbuilder";
 
 globalThis.curve_bls12381 = null;
 
-export default async function buildBls12381(singleThread, plugins) {
+export default async function buildBls12381(singleThread, plugins, overrideConcurrency) {
     if ((!singleThread) && (globalThis.curve_bls12381)) return globalThis.curve_bls12381;
 
     const moduleBuilder = new ModuleBuilder();
@@ -43,7 +43,8 @@ export default async function buildBls12381(singleThread, plugins) {
         n8r: 32,
         cofactorG1: Scalar.e("0x396c8c005555e1568c00aaab0000aaab", 16),
         cofactorG2: Scalar.e("0x5d543a95414e7f1091d50792876a202cd91de4547085abaa68a205b2e5a7ddfa628f1cb4d9e82ef21537e293a6691ae1616ec6e786f0c70cf1c38e31c7238e5", 16),
-        singleThread: singleThread ? true : false
+        singleThread: singleThread ? true : false,
+        overrideConcurrency: overrideConcurrency,
     };
 
     const curve = await buildEngine(params);
@@ -60,4 +61,3 @@ export default async function buildBls12381(singleThread, plugins) {
 
     return curve;
 }
-
